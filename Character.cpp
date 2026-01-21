@@ -1,5 +1,5 @@
 // Character.cpp
-// ffdfd
+//
 // Array of equipement
 //  When new equipment is acquired then all of the stats need to be recombined
 #include "Character.h"
