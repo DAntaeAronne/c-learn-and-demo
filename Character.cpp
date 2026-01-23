@@ -33,7 +33,6 @@ int Character::getBaseStat(EnumStats wantedStat){
 
 
 int Character::getEquipStat(EnumStats wantedStat){
-
     int statVal = 0;
 
     for (int item = static_cast<int>(Equipment::weapon); item < static_cast<int>(Equipment::count); item++){
