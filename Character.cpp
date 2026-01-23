@@ -10,43 +10,23 @@
 
 using std::string;
 
-Character::Character(int maxHp, int dmg, int def, int critC, int critDmg){
-    baseStats.maxHealth = maxHp;
-    baseStats.attackDmg = dmg;
-    baseStats.defense = def;
-    baseStats.critChance = critC;
-    baseStats.critDmgMod = critDmg;
-    curHealth = baseStats.maxHealth;
-    defending = false;
-    critHit = false;
+//const Stats& baseStatsView = baseStats;
+//const Stats& equipmentBonusView = equipmentBonus;
 
-    for (int i = static_cast<int>(Equipment::weapon); i < static_cast<int>(Equipment::count); i++){
-        equipmentBonus[i].maxHealth = 0;
-        equipmentBonus[i].attackDmg = 0;
-        equipmentBonus[i].defense = 0;
-        equipmentBonus[i].critChance = 0;
-        equipmentBonus[i].critDmgMod = 0;
-    };
+Character::Character(int maxHp, int dmg, int def, int critC, int critDmg) :
+    baseStats{maxHp, dmg, def, critC, critDmg}, curHealth(baseStats.maxHealth), defending(false), critHit(false){
+
+    for (int item = static_cast<int>(Equipment::weapon); item < static_cast<int>(Equipment::count); item++){
+        for (EnumStats stat = EnumStats::maxHealth; stat != EnumStats::count; stat = static_cast<EnumStats>(static_cast<int>(stat) + 1)){
+            equipmentBonus[item][stat] = 0;
+        }; // end of stat loop
+    }; // end of item loop
+
 } // End of Character initialization
 
 
 int Character::getBaseStat(EnumStats wantedStat){
-    switch (wantedStat){
-        case EnumStats::maxHealth:
-            return baseStats.maxHealth;
-
-        case EnumStats::attackDmg:
-            return baseStats.attackDmg;
-
-        case EnumStats::defense:
-            return baseStats.defense;
-
-        case EnumStats::critChance:
-            return baseStats.critChance;
-
-        case EnumStats::critDmgMod:
-            return baseStats.critDmgMod;
-    }
+    return baseStats[wantedStat];
 
     return 0;
 } // End of getBaseStat method
@@ -56,37 +36,9 @@ int Character::getEquipStat(EnumStats wantedStat){
 
     int statVal = 0;
 
-    switch (wantedStat){
-        case EnumStats::maxHealth:
-            for (int i = static_cast<int>(Equipment::weapon); i < static_cast<int>(Equipment::count); i++){
-                statVal += equipmentBonus[i].maxHealth;
-            };
-            break;
-
-        case EnumStats::attackDmg:
-            for (int i = static_cast<int>(Equipment::weapon); i < static_cast<int>(Equipment::count); i++){
-                statVal += equipmentBonus[i].attackDmg;
-            };
-            break;
-
-        case EnumStats::defense:
-            for (int i = static_cast<int>(Equipment::weapon); i < static_cast<int>(Equipment::count); i++){
-                statVal += equipmentBonus[i].defense;
-            };
-            break;
-
-        case EnumStats::critChance:
-            for (int i = static_cast<int>(Equipment::weapon); i < static_cast<int>(Equipment::count); i++){
-                statVal += equipmentBonus[i].critChance;
-            };
-            break;
-
-        case EnumStats::critDmgMod:
-            for (int i = static_cast<int>(Equipment::weapon); i < static_cast<int>(Equipment::count); i++){
-                statVal += equipmentBonus[i].critDmgMod;
-            };
-            break;
-    }
+    for (int item = static_cast<int>(Equipment::weapon); item < static_cast<int>(Equipment::count); item++){
+        statVal += equipmentBonus[item][wantedStat];
+    };
 
     return statVal;
 } // End of getEquipStat method
@@ -98,53 +50,12 @@ int Character::getCurHealth(){
 
 
 void Character::setBaseStat(EnumStats wantedStat, int val){
-    switch (wantedStat){
-        case EnumStats::maxHealth:
-            baseStats.maxHealth = val;
-            break;
-
-        case EnumStats::attackDmg:
-            baseStats.attackDmg = val;
-            break;
-
-        case EnumStats::defense:
-            baseStats.defense = val;
-            break;
-
-        case EnumStats::critChance:
-            baseStats.critChance = val;
-            break;
-
-        case EnumStats::critDmgMod:
-            baseStats.critDmgMod = val;
-            break;
-    }
-
+    baseStats[wantedStat] = val;
 } // End of setBaseStat method
 
 
 void Character::setEquipStat(EnumStats wantedStat, int val, Equipment item){
-    switch (wantedStat){
-        case EnumStats::maxHealth:
-            equipmentBonus[static_cast<int>(item)].maxHealth = val;
-            break;
-
-        case EnumStats::attackDmg:
-            equipmentBonus[static_cast<int>(item)].attackDmg = val;
-            break;
-
-        case EnumStats::defense:
-            equipmentBonus[static_cast<int>(item)].defense = val;
-            break;
-
-        case EnumStats::critChance:
-            equipmentBonus[static_cast<int>(item)].critChance = val;
-            break;
-
-        case EnumStats::critDmgMod:
-            equipmentBonus[static_cast<int>(item)].critDmgMod = val;
-            break;
-    }
+    equipmentBonus[static_cast<int>(item)][wantedStat] = val;
 } // End of setEquipStat method
 
 

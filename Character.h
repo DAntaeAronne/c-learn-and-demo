@@ -2,17 +2,11 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 #include <string>
+#include <stdexcept>
 
 class Character{
     public:
         Character(int hp, int dmg, int def, int critC, int critDmg);
-        struct Stats {
-            int maxHealth;
-            int attackDmg;
-            int defense;
-            int critChance;
-            int critDmgMod;
-        };
 
         enum struct EnumStats{
             maxHealth,
@@ -29,6 +23,31 @@ class Character{
             helmet,
             count,
         };
+
+        struct Stats {
+            int maxHealth;
+            int attackDmg;
+            int defense;
+            int critChance;
+            int critDmgMod;
+
+
+            int& operator[](EnumStats stat) {
+                switch (stat) {
+                      case EnumStats::maxHealth: return maxHealth;
+                      case EnumStats::attackDmg: return attackDmg;
+                      case EnumStats::defense: return defense;
+                      case EnumStats::critChance: return critChance;
+                      case EnumStats::critDmgMod: return critDmgMod;
+                      default: throw std::out_of_range("Invalid stat");
+                }
+            };
+
+            const int& operator[](EnumStats stat) const {
+                return const_cast<Stats&>(*this)[stat];
+            };
+        };
+
 
         // Accessors
         int getBaseStat(EnumStats wantedStat);
