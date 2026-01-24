@@ -1,58 +1,19 @@
 // Character.h
 #ifndef CHARACTER_H
 #define CHARACTER_H
+
 #include <string>
 #include <stdexcept>
+#include "Stats.h"
 
 class Character{
     public:
-        Character(int hp, int dmg, int def, int critC, int critDmg);
-
-        enum struct EnumStats{
-            maxHealth,
-            attackDmg,
-            defense,
-            critChance,
-            critDmgMod,
-            count,
-        };
-
-        enum struct Equipment{
-            weapon,
-            armor,
-            helmet,
-            count,
-        };
-
-        struct Stats {
-            int maxHealth;
-            int attackDmg;
-            int defense;
-            int critChance;
-            int critDmgMod;
-
-
-            int& operator[](EnumStats stat) {
-                switch (stat) {
-                      case EnumStats::maxHealth: return maxHealth;
-                      case EnumStats::attackDmg: return attackDmg;
-                      case EnumStats::defense: return defense;
-                      case EnumStats::critChance: return critChance;
-                      case EnumStats::critDmgMod: return critDmgMod;
-                      default: throw std::out_of_range("Invalid stat");
-                }
-            };
-
-            const int& operator[](EnumStats stat) const {
-                return const_cast<Stats&>(*this)[stat];
-            };
-        };
-
+        Character(Stats stats);
 
         // Accessors
-        int getBaseStat(EnumStats wantedStat);
-        int getEquipStat(EnumStats wantedStat);
-        int getCurHealth();
+        int getBaseStat(EnumStats wantedStat) const;
+        int getEquipStat(EnumStats wantedStat) const;
+        int getCurHealth() const;
 
         // Modifiers
         void setBaseStat(EnumStats wantedStat, int val);

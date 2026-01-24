@@ -1,8 +1,12 @@
 // Demo.cpp
 #include <iostream>
+#include <ctime>
 #include "Character.h"
 #include "Combat.h"
-#include <ctime>
+#include "Goblin.h"
+#include "Orc.h"
+#include "Skeleton.h"
+
 
 using std::cout;
 using std::cin;
@@ -11,16 +15,17 @@ using std::string;
 
 int main(){
 
-    srand(time(0));
-    int choice;
+    Stats baseStats = {150, 250, 6, 0, 900};
     string statsNames[5] = {"maxHealth", "attackDmg", "defense", "critChance", "critDmgMod"};
 
-    Character MC(150, 250, 6, 0, 900);
-    for (int i = 0; i < static_cast<int>(Character::EnumStats::count); i++){
+    Character MC(baseStats);
+    for (int i = 0; i < static_cast<int>(EnumStats::count); i++){
 
-        Character::EnumStats statCheck = static_cast<Character::EnumStats>(i);
+        EnumStats statCheck = static_cast<EnumStats>(i);
         cout << statsNames[i] << ": " << MC.getBaseStat(statCheck) << "\n";
     }
+
+    Skeleton jay = Skeleton();
 
     cout << "\n\n";
     cout << "Are we alive?\n";
@@ -37,7 +42,7 @@ int main(){
     cout << "Seems you have " << MC.getCurHealth() << " hp left..\n";
     cout << "catch *throws knife*\n\n";
 
-    MC.takeDmg(24);
+    MC.takeDmg(jay.calcAttackDmg());
 
     cout << "How are you now?\n";
     cout << "Seems you have " << MC.getCurHealth() << " hp left..\n";
@@ -63,13 +68,15 @@ int main(){
 
     cout << "W-Wait!! You can't attack me ba- *pow*\n";
 
+
     for (int i = 0; i < 10; i++){
-        cout << "(you did " << MC.calcAttackDmg() << " dmg. Nice)\n";
+        cout << "(you did " << jay.calcAttackDmg() << " dmg. Nice)\n";
     }
+
 
     cout << "\n\n\n\n\n";
     cout << "test: \n";
-    cout << "max health: " << MC.getBaseStat(Character::EnumStats::maxHealth) << "\n\n";
+    cout << "max health: " << MC.getBaseStat(EnumStats::maxHealth) << "\n\n";
     cout << "cur health: " << MC.getCurHealth();
 
     return 0;

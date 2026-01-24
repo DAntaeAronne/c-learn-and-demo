@@ -2,11 +2,11 @@
 
 int randomNumber() {
 
-    // Making rng static ensures that it stays the same
-    // Between different invocations of the function
-    static std::mt19937 rng(rand());
+    std::random_device rd;
 
-    int val = rng();
+    std::mt19937 gen(rd());
+
+    int val = rd();
 
     return abs(val);
 }

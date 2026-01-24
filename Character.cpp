@@ -2,19 +2,19 @@
 //
 // Array of equipement
 //  When new equipment is acquired then all of the stats need to be recombined
-#include "Character.h"
-#include "RNG.h"
 #include <iostream>
 #include <random>
-
+#include "Character.h"
+#include "Stats.h"
+#include "RNG.h"
 
 using std::string;
 
 //const Stats& baseStatsView = baseStats;
 //const Stats& equipmentBonusView = equipmentBonus;
 
-Character::Character(int maxHp, int dmg, int def, int critC, int critDmg) :
-    baseStats{maxHp, dmg, def, critC, critDmg}, curHealth(baseStats.maxHealth), defending(false), critHit(false){
+Character::Character(Stats stats) :
+    baseStats(stats), curHealth(baseStats.maxHealth), defending(false), critHit(false){
 
     for (int item = static_cast<int>(Equipment::weapon); item < static_cast<int>(Equipment::count); item++){
         for (EnumStats stat = EnumStats::maxHealth; stat != EnumStats::count; stat = static_cast<EnumStats>(static_cast<int>(stat) + 1)){
@@ -25,14 +25,14 @@ Character::Character(int maxHp, int dmg, int def, int critC, int critDmg) :
 } // End of Character initialization
 
 
-int Character::getBaseStat(EnumStats wantedStat){
+int Character::getBaseStat(EnumStats wantedStat) const{
     return baseStats[wantedStat];
 
     return 0;
 } // End of getBaseStat method
 
 
-int Character::getEquipStat(EnumStats wantedStat){
+int Character::getEquipStat(EnumStats wantedStat) const{
     int statVal = 0;
 
     for (int item = static_cast<int>(Equipment::weapon); item < static_cast<int>(Equipment::count); item++){
@@ -43,7 +43,7 @@ int Character::getEquipStat(EnumStats wantedStat){
 } // End of getEquipStat method
 
 
-int Character::getCurHealth(){
+int Character::getCurHealth() const{
     return curHealth;
 } // End of getCurHealth method
 
@@ -98,14 +98,16 @@ int Character::calcAttackDmg(){
     //  the character needs to have a critChance above 0 for crits to be available
 
     int dmgDealt = randomNumber() % (baseStats.attackDmg + getEquipStat(EnumStats::attackDmg));
+    int totalCritChance = baseStats.critChance + getEquipStat(EnumStats::critChance);
+    int critDmgDone = static_cast<int>(static_cast<double>(dmgDealt) * (1.0 + static_cast<double>(baseStats.critDmgMod + getEquipStat(EnumStats::critDmgMod)) / 100));
 
-    if (((randomNumber() % 100) < (baseStats.critChance + getEquipStat(EnumStats::critChance))) && ((baseStats.critChance + getEquipStat(EnumStats::critChance)) > 0)){
+    if (((randomNumber() % 100) < totalCritChance) && (totalCritChance > 0)){
         critHit = true;
         std::cout << "- WOAH!!! NICE CRIT!!! - ";
     }
 
     if (critHit){
-        dmgDealt = dmgDealt * (1.0 + (double)(baseStats.critDmgMod + getEquipStat(EnumStats::critDmgMod)) / 100);
+        dmgDealt = critDmgDone;
     }
 
     return dmgDealt;
