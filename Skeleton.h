@@ -5,19 +5,18 @@
 
 #include <vector>
 #include "Character.h"
+#include "Enemy.h"
 #include "Stats.h"
 
 using std::vector;
 
 extern Stats skeletonStats;
 
-class Skeleton : public Character{
+class Skeleton : public Enemy{
     public:
-        Skeleton() : Character(skeletonStats, CharacterType::skeleton){}
+        Skeleton() : Enemy(skeletonStats, CharacterType::skeleton){}
 
-        vector<Action> chooseAction();
         vector<Action> lowHealthAction();
-
         void setDefenseLowered(bool val);
 
 

@@ -1,18 +1,12 @@
 // Orc.cpp
 #include <vector>
-#include "Orc.h"
 #include "Character.h"
+#include "Enemy.h"
+#include "Orc.h"
 #include "Stats.h"
 #include "RNG.h"
 
 using std::vector;
-
-vector<Action> Orc::chooseAction(){
-    vector<Action> action;
-    action.push_back(static_cast<Action>(randomNumber() % static_cast<int>(Action::count)));
-
-    return action;
-} // End of chooseAction method
 
 
 // When the Orc reaches the low health threshold

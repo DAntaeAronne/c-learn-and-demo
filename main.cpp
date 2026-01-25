@@ -4,9 +4,8 @@
 #include <vector>
 #include "Character.h"
 #include "Combat.h"
-#include "Goblin.h"
-#include "Orc.h"
-#include "Skeleton.h"
+#include "Enemy.h"
+#include "RNG.h"
 
 
 using std::cout;
@@ -21,9 +20,18 @@ int main(){
 
     Character MC(baseStats,  CharacterType::player);
 
-    vector<Character> fighters = {MC};
-
     while (MC.isAlive()){
+        vector<Character> fighters = {MC};
+
+        // Create a random amount of random enemies to send to combat
+        // Maximum is 3
+
+        int enemyCount = (randomNumber() % 3) + 1;
+
+        for (int i = 0; i < enemyCount; i++){
+            fighters.push_back(makeRandomEnemy());
+        }
+
         combatCommence(fighters);
     }
 

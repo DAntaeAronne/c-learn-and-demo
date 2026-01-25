@@ -1,58 +1,48 @@
 // Enemy.cpp
 
-/*
-
-
-
-
-#include "Character.h"
-#include "Enemy.h"
-#include "RNG.h"
 #include <iostream>
 #include <random>
-#include <typeinfo>
+#include <vector>
+#include "Character.h"
+#include "Enemy.h"
+#include "Skeleton.h"
+#include "Goblin.h"
+#include "Orc.h"
+#include "RNG.h"
 
 using std::string;
+using std::vector;
 
+vector<Action> Enemy::enemyChooseAction(){
+    vector<Action> action;
+    action.push_back(static_cast<Action>(randomNumber() % static_cast<int>(Action::count)));
 
-Enemy::Enemy(EnemyType type, int hp, int dmg, int def, int critC, int critDmg) : Character(hp, dmg, def, critC, critDmg) {
-    this->type = type;
-}
+    return action;
+} // End of chooseAction method
 
+Enemy makeRandomEnemy(){
+    // Goblin as place holder
+    Enemy createdEnemy = Goblin();
+    CharacterType enemyType = static_cast<CharacterType>(randomNumber() % static_cast<int>(CharacterType::count));
 
-Enemy::~Enemy() {
-    // Destructor implementation
-}
+    // So long as the type is the player
+    //  It will keep rolling for a new type
+    while (enemyType == CharacterType::player){
+        enemyType = static_cast<CharacterType>(randomNumber() % static_cast<int>(CharacterType::count));
+    }
 
+    // Create an enemy based on the type
+    switch(enemyType){
+        case CharacterType::goblin:
+            createdEnemy = Goblin();
+            break;
+        case CharacterType::orc:
+            createdEnemy = Orc();
+            break;
+        case CharacterType::skeleton:
+            createdEnemy = Skeleton();
+            break;
+    }
 
-EnemyType Enemy::getRandomType() {
-    int type = randomNumber() % static_cast<int>(EnemyType::count);
-    return static_cast<EnemyType>(type);
-}
-
-
-EnemyType Enemy::getType() const {
-    return type;
-}
-
-
-Enemy Enemy::makeRandomEnemy() {
-    EnemyType type = GetRandomType();
-
-    switch(type):
-        case EnemyType::goblin:
-            return Enemy(type, 100, 20, 3, 10, 25);
-
-        case EnemyType::orc:
-            return Enemy(type, 200, 30, 10, 5, 25);
-
-        case EnemyType::skeleton:
-            return Enemy(type, 50, 25, 1, 25, 35);
-
-        default:
-            throw std::out_of_range("Enemy creation failed");
-}
-
-
-
-*/
+    return createdEnemy;
+} // End of makeRandomEnemy method

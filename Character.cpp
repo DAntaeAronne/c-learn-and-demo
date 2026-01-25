@@ -8,6 +8,7 @@
 #include "Stats.h"
 #include "RNG.h"
 
+using std::cout;
 using std::string;
 
 Character::Character(Stats stats, CharacterType charType) :
@@ -88,8 +89,29 @@ void Character::takeDmg(int dmgTaken){
         totalDmgTaken = dmgTaken * (100.00 / (100 + 3 * (baseStats.defense + getEquipStat(EnumStats::defense))));
     }
 
-    std::cout << "\ntook " << totalDmgTaken << " dmg\n";
+    string target;
+
+    switch(type){
+        case CharacterType::goblin:
+            target = "Goblin";
+            break;
+        case CharacterType::orc:
+            target = "Orc";
+            break;
+        case CharacterType::skeleton:
+            target = "Skeleton";
+            break;
+        default:
+            target = "You";
+            break;
+    }
+
     setCurHeatlh(curHealth - totalDmgTaken);
+
+    cout <<  target << " took " << totalDmgTaken << " dmg and is now at: " << getCurHealth() << "\n";
+
+
+
 } // End of takeDmg method
 
 
@@ -103,12 +125,14 @@ int Character::calcAttackDmg(){
 
     if (((randomNumber() % 100) < totalCritChance) && (totalCritChance > 0)){
         critHit = true;
-        std::cout << "- WOAH!!! NICE CRIT!!! - ";
+        cout << "- WOAH!!! NICE CRIT!!! - ";
     }
 
     if (critHit){
         dmgDealt = critDmgDone;
     }
+
+    cout << "Base: " << baseStats.attackDmg << "|||||Equip: " << getEquipStat(EnumStats::attackDmg) << " CHECK CHECK\n";
 
     return dmgDealt;
 } // End of calcAttackDmg method

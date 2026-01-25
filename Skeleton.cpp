@@ -1,18 +1,12 @@
 // Skeleton.cpp
 #include <vector>
-#include "Skeleton.h"
 #include "Character.h"
+#include "Enemy.h"
+#include "Skeleton.h"
 #include "Stats.h"
 #include "RNG.h"
 
 using std::vector;
-
-vector<Action> Skeleton::chooseAction(){
-    vector<Action> action;
-    action.push_back(static_cast<Action>(randomNumber() % static_cast<int>(Action::count)));
-
-    return action;
-} // End of chooseAction method
 
 
 // When the Skeleton reaches the low health threshold

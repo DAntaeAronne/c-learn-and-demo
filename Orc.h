@@ -5,17 +5,17 @@
 
 #include <vector>
 #include "Character.h"
+#include "Enemy.h"
 #include "Stats.h"
 
 using std::vector;
 
 extern Stats orcStats;
 
-class Orc : public Character{
+class Orc : public Enemy{
     public:
-        Orc() : Character(orcStats, CharacterType::orc){}
+        Orc() : Enemy(orcStats, CharacterType::orc){}
 
-        vector<Action> chooseAction();
         vector<Action> lowHealthAction();
 
 };

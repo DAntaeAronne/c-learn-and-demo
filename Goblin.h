@@ -6,16 +6,16 @@
 #include <vector>
 #include "Character.h"
 #include "Stats.h"
+#include "Enemy.h"
 
 using std::vector;
 
 extern Stats goblinStats;
 
-class Goblin : public Character{
+class Goblin : public Enemy{
     public:
-        Goblin() : Character(goblinStats, CharacterType::goblin){}
+        Goblin() : Enemy(goblinStats, CharacterType::goblin){}
 
-        vector<Action> chooseAction();
         vector<Action> lowHealthAction();
 };
 
