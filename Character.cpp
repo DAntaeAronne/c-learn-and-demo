@@ -10,11 +10,8 @@
 
 using std::string;
 
-//const Stats& baseStatsView = baseStats;
-//const Stats& equipmentBonusView = equipmentBonus;
-
-Character::Character(Stats stats) :
-    baseStats(stats), curHealth(baseStats.maxHealth), defending(false), critHit(false){
+Character::Character(Stats stats, CharacterType charType) :
+    baseStats(stats), type(charType), curHealth(baseStats.maxHealth), defending(false), critHit(false){
 
     for (int item = static_cast<int>(Equipment::weapon); item < static_cast<int>(Equipment::count); item++){
         for (EnumStats stat = EnumStats::maxHealth; stat != EnumStats::count; stat = static_cast<EnumStats>(static_cast<int>(stat) + 1)){
@@ -27,8 +24,6 @@ Character::Character(Stats stats) :
 
 int Character::getBaseStat(EnumStats wantedStat) const{
     return baseStats[wantedStat];
-
-    return 0;
 } // End of getBaseStat method
 
 
@@ -46,6 +41,11 @@ int Character::getEquipStat(EnumStats wantedStat) const{
 int Character::getCurHealth() const{
     return curHealth;
 } // End of getCurHealth method
+
+
+CharacterType Character::getCharacterType() const{
+    return type;
+} // End of getCharacterType method
 
 
 void Character::setBaseStat(EnumStats wantedStat, int val){
@@ -73,13 +73,13 @@ bool Character::isAlive(){
 } // End of setEquipStat method
 
 
-void Character::takeDmg(double dmgTaken){
+void Character::takeDmg(int dmgTaken){
     int totalDmgTaken;
 
     // If not defending
     //   Then take damage with only passive defense in mind
     if (!defending){
-        totalDmgTaken = dmgTaken * (100.00 / (100 + baseStats.defense + getEquipStat(EnumStats::defense)));
+        totalDmgTaken = static_cast<int>(dmgTaken) * (100.00 / (100 + baseStats.defense + getEquipStat(EnumStats::defense)));
     }
 
     // Else

@@ -3,18 +3,20 @@
 
 #define GOBLIN_H
 
+#include <vector>
 #include "Character.h"
 #include "Stats.h"
 
-Stats goblinStats = {100, 20, 3, 10, 25};
+using std::vector;
+
+extern Stats goblinStats;
 
 class Goblin : public Character{
     public:
-        Goblin() : Character(goblinStats){}
+        Goblin() : Character(goblinStats, CharacterType::goblin){}
 
-        void attack();
-        void defend();
-
+        vector<Action> chooseAction();
+        vector<Action> lowHealthAction();
 };
 
 #endif

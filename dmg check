@@ -1,3 +1,12 @@
+ for (int i = 0; i < static_cast<int>(EnumStats::count); i++){
+
+        EnumStats statCheck = static_cast<EnumStats>(i);
+        cout << statsNames[i] << ": " << MC.getBaseStat(statCheck) << "\n";
+    }
+
+    Orc jay = Orc();
+    Goblin luke = Goblin();
+
     cout << "\n\n";
     cout << "Are we alive?\n";
 
@@ -13,12 +22,14 @@
     cout << "Seems you have " << MC.getCurHealth() << " hp left..\n";
     cout << "catch *throws knife*\n\n";
 
-    MC.takeDmg(12);
+    MC.takeDmg(jay.calcAttackDmg());
 
     cout << "How are you now?\n";
     cout << "Seems you have " << MC.getCurHealth() << " hp left..\n";
     cout << "catch *throws knife*\n\n";
 
+
+    MC.setDefending(true);
     MC.takeDmg(MC.getCurHealth() + 10);
 
     cout << "Well, still around?\n";
@@ -33,4 +44,17 @@
     cout << "\n";
     cout << "HOW?!?!\n";
     cout << "With " << MC.getCurHealth() << " hp left?!?!\n";
-    cout << "Cheater";
+    cout << "Cheater\n";
+
+    cout << "W-Wait!! You can't attack me ba- *pow*\n";
+
+
+    for (int i = 0; i < 10; i++){
+        cout << "(you did " << jay.calcAttackDmg() << " dmg. Nice)\n";
+    }
+
+
+    cout << "\n\n\n\n\n";
+    cout << "test: \n";
+    cout << "max health: " << MC.getBaseStat(EnumStats::maxHealth) << "\n\n";
+    cout << "cur health: " << MC.getCurHealth();

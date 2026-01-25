@@ -1,19 +1,22 @@
-// Goblin.h
+// Orc.h
 #ifndef ORC_H
 
 #define ORC_H
 
+#include <vector>
 #include "Character.h"
 #include "Stats.h"
 
-Stats orcStats = {200, 30, 10, 5, 25};
+using std::vector;
+
+extern Stats orcStats;
 
 class Orc : public Character{
     public:
-        Orc() : Character(orcStats){}
+        Orc() : Character(orcStats, CharacterType::orc){}
 
-        void attack();
-        void defend();
+        vector<Action> chooseAction();
+        vector<Action> lowHealthAction();
 
 };
 

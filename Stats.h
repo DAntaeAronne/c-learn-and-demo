@@ -2,10 +2,26 @@
 
 #define STATS_H
 
+#include <stdexcept>
+
+enum struct Action{
+    attack,
+    defend,
+    count,
+};
+
+enum struct CharacterType {
+    player,
+    goblin,
+    orc,
+    skeleton,
+    count,
+};
 
 enum struct EnumStats{
     maxHealth,
     attackDmg,
+    attackSpeed,
     defense,
     critChance,
     critDmgMod,
@@ -22,6 +38,7 @@ enum struct Equipment{
 struct Stats {
     int maxHealth;
     int attackDmg;
+    int attackSpeed;
     int defense;
     int critChance;
     int critDmgMod;
@@ -34,6 +51,9 @@ struct Stats {
 
             case EnumStats::attackDmg:
                 return attackDmg;
+
+            case EnumStats::attackSpeed:
+                return attackSpeed;
 
             case EnumStats::defense:
                 return defense;
