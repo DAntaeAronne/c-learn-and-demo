@@ -1,0 +1,15 @@
+Requirements:
+    - A c++ compiler capable of version 20
+    - CMake
+
+
+Build Instructions:
+
+    This project uses CMake to generate a build. Anyone with a C++20 compiler and CMake can build it.
+
+    Clone the repo
+        git clone https://github.com/DAntaeAronne/c-learn-and-demo.git
+        cd c-learn-and-demo
+
+    Run one command to build:
+        bash -c "mkdir -p build && cd build && cmake .. && cmake --build ."
