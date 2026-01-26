@@ -15,17 +15,15 @@ using std::vector;
 
 int main(){
 
-    Stats baseStats = {150, 250, 12, 6, 0, 900};
+    Stats baseStats = {10, 250, 12, 6, 0, 900};
     string statsNames[5] = {"maxHealth", "attackDmg", "defense", "critChance", "critDmgMod"};
 
     Character MC(baseStats,  CharacterType::player);
+    vector<Character> fighters{MC};
 
-    while (MC.isAlive()){
-        vector<Character> fighters = {MC};
-
+    while (fighters[0].isAlive()){
         // Create a random amount of random enemies to send to combat
         // Maximum is 3
-
         int enemyCount = (randomNumber() % 3) + 1;
 
         for (int i = 0; i < enemyCount; i++){
@@ -33,7 +31,7 @@ int main(){
         }
 
         combatCommence(fighters);
-    }
+    } // End of game
 
     cout << "\nHOPE YOU HAD FUN!\n";
 

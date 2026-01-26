@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <vector>
 #include <typeinfo>
+#include <limits>
 #include "Combat.h"
 #include "Character.h"
 #include "Enemy.h"
@@ -13,28 +14,34 @@ using std::cout;
 using std::cin;
 using std::string;
 using std::vector;
+using std::max;
+using std::streamsize;
+using std::numeric_limits;
 
 bool endGame;
 
 void combatCommence(vector<Character>& fighters){
     endGame = false;
 
+
+
     // Combat loop
     // So long as the player is alive and there are enemies to fight,
     //  Combat will continue
 
-    Character& player = fighters[0];
+    Character* player = &fighters[0];
 
-    while (player.isAlive() && (fighters.size() > 1) && !endGame){
+    // Combat loop
+    while (player->isAlive() && (fighters.size() > 1)){
 
         int i = 0;
         vector<AttackOrder> attackOrder;
 
         // Fighter Choice loop
         //Choose an action for each fighter
-        for (Character fighter : fighters){
+        for (Character& fighter : fighters){
             vector<Action> fighterAction;
-            Character target = {{0,0,0,0,0,0}, CharacterType::goblin};
+            Character* target = &fighters[0];
 
             // If: Fighter is the player
             //  Then: Prompt the player to choose an action
@@ -45,7 +52,7 @@ void combatCommence(vector<Character>& fighters){
                 // If: Attacking
                 //  Then: Choose your target
                 if (fighterAction[0] == Action::attack){
-                    target = chooseTarget(fighters);
+                    target = &chooseTarget(fighters);
                 }
 
                 i++;
@@ -79,7 +86,7 @@ void combatCommence(vector<Character>& fighters){
             } // End of Enemy Action
 
 
-            AttackOrder tempInfo{fighter, target, fighterAction};
+            AttackOrder tempInfo{&fighter, target, fighterAction};
 
             switch (fighterAction[0]){
                 case Action::attack:
@@ -93,23 +100,29 @@ void combatCommence(vector<Character>& fighters){
 
         } // End of Fighters Choice loop
 
+        if(endGame){
+            player->setCurHeatlh(-1);
+            break;
+        }
 
 
         // Sort the attack order based on speed
         std::sort(attackOrder.begin(), attackOrder.end(), [](const AttackOrder& a, const AttackOrder& b) {
             // 'a' comes before 'b' if 'a' is faster
-            return (a.attacker.getBaseStat(EnumStats::attackSpeed) + a.attacker.getEquipStat(EnumStats::attackSpeed)) > (b.attacker.getBaseStat(EnumStats::attackSpeed) + b.attacker.getEquipStat(EnumStats::attackSpeed));
+            return (a.attacker->getBaseStat(EnumStats::attackSpeed) + a.attacker->getEquipStat(EnumStats::attackSpeed)) > (b.attacker->getBaseStat(EnumStats::attackSpeed) + b.attacker->getEquipStat(EnumStats::attackSpeed));
         });
 
         // All Attacks loop
         // Attack in order from fastest to slowest
         // Allowing multiple attacks to go through as well
-        for (AttackOrder attack : attackOrder){
-            for(Action act : attack.actions){
-                int dmg = attack.attacker.calcAttackDmg();
+        for (AttackOrder& attack : attackOrder){
+            int dmg;
+            // Damage loop
+            for(Action& act : attack.actions){
+                dmg = attack.attacker->calcAttackDmg();
 
                 string atr;
-                switch(attack.attacker.getCharacterType()){
+                switch(attack.attacker->getCharacterType()){
                     case CharacterType::goblin:
                         atr = "Goblin";
                         break;
@@ -125,26 +138,27 @@ void combatCommence(vector<Character>& fighters){
                 }
                 cout << atr << " is attacking: ";
 
-                attack.target.takeDmg(dmg);
+                attack.target->takeDmg(dmg);
 
                 cout << "\n\n";
-                if(atr == "You" && !attack.attacker.isAlive()){
-                    cout << "You died taking " << dmg << " dmg\n\n";
+                if(atr == "You" && !attack.attacker->isAlive()){
+                    break;
                 }
-            }
+            } // End of Damage loop
 
             // If: The target is dead then remove
             //  Then: from fighters and the attackOrder, or end the game if it was the player
-            if (!attack.target.isAlive()){
+            if (!attack.target->isAlive()){
 
-
-                if (!player.isAlive()){
+                if (!player->isAlive()){
+                    cout << "You died taking " << dmg << " dmg\n\n";
+                    endGame = true;
                     break;
                 }
 
                 attackOrder.erase(remove_if(attackOrder.begin(), attackOrder.end(),
                     [](AttackOrder& dead) {
-                        return !dead.target.isAlive() || !dead.attacker.isAlive();
+                        return !dead.target->isAlive() || !dead.attacker->isAlive();
                     }),
                     attackOrder.end()
                 ); // end of Erase for attackOrder
@@ -157,14 +171,19 @@ void combatCommence(vector<Character>& fighters){
                 ); // end of Erase for fighters
             } // End of Removal
 
+            if(endGame){
+                player->setCurHeatlh(-1);
+                break;
+            }
         } // End of All Attacks loop
 
         // Resetting fighter states at the end of the turn
-        for (Character fighter : fighters){
+        for (Character& fighter : fighters){
             fighter.resetTurn();
         }
-    } /// End of Combat loop
-} /// End of combatCommence method
+
+    } // End of Combat loop
+} // End of combatCommence method
 
 
 vector<Action> playerChooseAction(){
@@ -182,6 +201,16 @@ vector<Action> playerChooseAction(){
         cout << "9.) Leave (End Game)\n";
         cout << "Choice: ";
         cin >> choice;
+
+
+        // If: cin fails (non-integer input)
+        //  Then: clear error state and ignore the invalid input
+        if (cin.fail()) {
+            cout << "That's not a choice silly :3 c'mon, try again!\n\n";
+            cin.clear(); // Clears the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignores invalid input in the buffer
+            continue;
+        }
 
         // If choice is one of the actions then end the loop
         if (((choice >= 1) && (choice < (static_cast<int>(Action::count) + 1))) || choice == 9){
@@ -208,7 +237,7 @@ vector<Action> playerChooseAction(){
 } // end of playerChooseAction method
 
 
-Character chooseTarget(vector<Character>& fighters){
+Character& chooseTarget(vector<Character>& fighters){
 
     string enType;
     int target;
@@ -236,6 +265,15 @@ Character chooseTarget(vector<Character>& fighters){
 
         cout << "Choose your target: ";
         cin >> target;
+
+        // If: cin fails (non-integer input)
+        //  Then: clear error state and ignore the invalid input
+        if (cin.fail()) {
+            cout << "That's not a choice silly :3 c'mon, try again!\n\n";
+            cin.clear(); // Clears the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignores invalid input in the buffer
+            continue;
+        }
 
         // If choice is one of the actions then end the loop
         if (((target >= 1) && (target < fighters.size()))){
