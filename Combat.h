@@ -20,5 +20,6 @@ vector<Action> playerChooseAction();
 
 Character& chooseTarget(vector<Character>& fighters);
 
+void rewardSelection(Character& player);
 
 #endif

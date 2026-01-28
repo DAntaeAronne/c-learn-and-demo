@@ -6,20 +6,19 @@
 #include <stdexcept>
 #include "Stats.h"
 
-
 class Character{
     public:
         Character(Stats stats, CharacterType charType);
 
         // Accessors
-        int getBaseStat(EnumStats wantedStat) const;
-        int getEquipStat(EnumStats wantedStat) const;
+        int getBaseStat(StatType wantedStat) const;
+        int getEquipStat(StatType wantedStat) const;
         int getCurHealth() const;
         CharacterType getCharacterType() const;
 
         // Modifiers
-        void setBaseStat(EnumStats wantedStat, int val);
-        void setEquipStat(EnumStats wantedStat, int val, Equipment item);
+        void setBaseStat(StatType wantedStat, int val);
+        void setEquipStat(StatType wantedStat, int val, EquipmentType item);
         void setCurHeatlh(int val);
         void setDefending(bool val);
 

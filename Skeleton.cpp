@@ -12,9 +12,8 @@ using std::vector;
 // When the Skeleton reaches the low health threshold
 //  Lower defense and attack twice
 vector<Action> Skeleton::lowHealthAction(){
-
     if (!defenseLowered){
-        Character::setBaseStat(EnumStats::defense, (getBaseStat(EnumStats::defense) / 2));
+        Character::setBaseStat(StatType::defense, (getBaseStat(StatType::defense) / 2));
         setDefenseLowered(true);
     }
 

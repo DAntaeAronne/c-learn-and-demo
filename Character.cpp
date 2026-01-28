@@ -14,8 +14,8 @@ using std::string;
 Character::Character(Stats stats, CharacterType charType) :
     baseStats(stats), type(charType), curHealth(baseStats.maxHealth), defending(false), critHit(false){
 
-    for (int item = static_cast<int>(Equipment::weapon); item < static_cast<int>(Equipment::count); item++){
-        for (EnumStats stat = EnumStats::maxHealth; stat != EnumStats::count; stat = static_cast<EnumStats>(static_cast<int>(stat) + 1)){
+    for (int item = static_cast<int>(EquipmentType::weapon); item < static_cast<int>(EquipmentType::count); item++){
+        for (StatType stat = StatType::maxHealth; stat != StatType::count; stat = static_cast<StatType>(static_cast<int>(stat) + 1)){
             equipmentBonus[item][stat] = 0;
         }; // end of stat loop
     }; // end of item loop
@@ -23,15 +23,15 @@ Character::Character(Stats stats, CharacterType charType) :
 } // End of Character initialization
 
 
-int Character::getBaseStat(EnumStats wantedStat) const{
+int Character::getBaseStat(StatType wantedStat) const{
     return baseStats[wantedStat];
 } // End of getBaseStat method
 
 
-int Character::getEquipStat(EnumStats wantedStat) const{
+int Character::getEquipStat(StatType wantedStat) const{
     int statVal = 0;
 
-    for (int item = static_cast<int>(Equipment::weapon); item < static_cast<int>(Equipment::count); item++){
+    for (int item = static_cast<int>(EquipmentType::weapon); item < static_cast<int>(EquipmentType::count); item++){
         statVal += equipmentBonus[item][wantedStat];
     };
 
@@ -49,12 +49,12 @@ CharacterType Character::getCharacterType() const{
 } // End of getCharacterType method
 
 
-void Character::setBaseStat(EnumStats wantedStat, int val){
+void Character::setBaseStat(StatType wantedStat, int val){
     baseStats[wantedStat] = val;
 } // End of setBaseStat method
 
 
-void Character::setEquipStat(EnumStats wantedStat, int val, Equipment item){
+void Character::setEquipStat(StatType wantedStat, int val, EquipmentType item){
     equipmentBonus[static_cast<int>(item)][wantedStat] = val;
 } // End of setEquipStat method
 
@@ -80,13 +80,13 @@ void Character::takeDmg(int dmgTaken){
     // If not defending
     //   Then take damage with only passive defense in mind
     if (!defending){
-        totalDmgTaken = static_cast<int>(dmgTaken) * (100.00 / (100 + baseStats.defense + getEquipStat(EnumStats::defense)));
+        totalDmgTaken = static_cast<int>(dmgTaken) * (100.00 / (100 + baseStats.defense + getEquipStat(StatType::defense)));
     }
 
     // Else
     //   Mulltipy total defense stat by 3
     else{
-        totalDmgTaken = dmgTaken * (100.00 / (100 + 3 * (baseStats.defense + getEquipStat(EnumStats::defense))));
+        totalDmgTaken = dmgTaken * (100.00 / (100 + 3 * (baseStats.defense + getEquipStat(StatType::defense))));
     }
 
     string target;
@@ -119,9 +119,9 @@ int Character::calcAttackDmg(){
     // Regardless of the number generated,
     //  the character needs to have a critChance above 0 for crits to be available
 
-    int dmgDealt = randomNumber() % (baseStats.attackDmg + getEquipStat(EnumStats::attackDmg));
-    int totalCritChance = baseStats.critChance + getEquipStat(EnumStats::critChance);
-    int critDmgDone = static_cast<int>(static_cast<double>(dmgDealt) * (1.0 + static_cast<double>(baseStats.critDmgMod + getEquipStat(EnumStats::critDmgMod)) / 100));
+    int dmgDealt = randomNumber() % (baseStats.attackDmg + getEquipStat(StatType::attackDmg));
+    int totalCritChance = baseStats.critChance + getEquipStat(StatType::critChance);
+    int critDmgDone = static_cast<int>(static_cast<double>(dmgDealt) * (1.0 + static_cast<double>(baseStats.critDmgMod + getEquipStat(StatType::critDmgMod)) / 100));
 
     if (((randomNumber() % 100) < totalCritChance) && (totalCritChance > 0)){
         critHit = true;
@@ -132,7 +132,7 @@ int Character::calcAttackDmg(){
         dmgDealt = critDmgDone;
     }
 
-    cout << "Base: " << baseStats.attackDmg << "|||||Equip: " << getEquipStat(EnumStats::attackDmg) << " CHECK CHECK\n";
+    cout << "Base: " << baseStats.attackDmg << "|||||Equip: " << getEquipStat(StatType::attackDmg) << " CHECK CHECK\n";
 
     return dmgDealt;
 } // End of calcAttackDmg method

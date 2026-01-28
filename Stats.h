@@ -18,7 +18,7 @@ enum struct CharacterType {
     count,
 };
 
-enum struct EnumStats{
+enum struct StatType{
     maxHealth,
     attackDmg,
     attackSpeed,
@@ -28,7 +28,7 @@ enum struct EnumStats{
     count,
 };
 
-enum struct Equipment{
+enum struct EquipmentType{
     weapon,
     armor,
     helmet,
@@ -44,24 +44,24 @@ struct Stats {
     int critDmgMod;
 
 
-    int& operator[](EnumStats stat) {
+    int& operator[](StatType stat) {
         switch (stat) {
-            case EnumStats::maxHealth:
+            case StatType::maxHealth:
                 return maxHealth;
 
-            case EnumStats::attackDmg:
+            case StatType::attackDmg:
                 return attackDmg;
 
-            case EnumStats::attackSpeed:
+            case StatType::attackSpeed:
                 return attackSpeed;
 
-            case EnumStats::defense:
+            case StatType::defense:
                 return defense;
 
-            case EnumStats::critChance:
+            case StatType::critChance:
                 return critChance;
 
-            case EnumStats::critDmgMod:
+            case StatType::critDmgMod:
                 return critDmgMod;
 
             default:
@@ -69,7 +69,7 @@ struct Stats {
         }
     };
 
-    const int& operator[](EnumStats stat) const {
+    const int& operator[](StatType stat) const {
         return const_cast<Stats&>(*this)[stat];
     };
 };

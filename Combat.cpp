@@ -4,10 +4,12 @@
 #include <vector>
 #include <typeinfo>
 #include <limits>
+#include <iomanip>
 #include "Combat.h"
 #include "Character.h"
 #include "Enemy.h"
 #include "Stats.h"
+#include "Equipment.h"
 
 
 using std::cout;
@@ -17,13 +19,12 @@ using std::vector;
 using std::max;
 using std::streamsize;
 using std::numeric_limits;
+using std::setw;
 
 bool endGame;
 
 void combatCommence(vector<Character>& fighters){
     endGame = false;
-
-
 
     // Combat loop
     // So long as the player is alive and there are enemies to fight,
@@ -63,7 +64,7 @@ void combatCommence(vector<Character>& fighters){
             else{
 
                 // The low health threshold will be 25% of thier max health
-                int fighterMaxHp = fighter.getBaseStat(EnumStats::maxHealth) + fighter.getEquipStat(EnumStats::maxHealth);
+                int fighterMaxHp = fighter.getBaseStat(StatType::maxHealth) + fighter.getEquipStat(StatType::maxHealth);
                 double lowHealthThreshold = 0.25 * fighterMaxHp;
 
                 // If: They are above the low health threshold
@@ -109,7 +110,7 @@ void combatCommence(vector<Character>& fighters){
         // Sort the attack order based on speed
         std::sort(attackOrder.begin(), attackOrder.end(), [](const AttackOrder& a, const AttackOrder& b) {
             // 'a' comes before 'b' if 'a' is faster
-            return (a.attacker->getBaseStat(EnumStats::attackSpeed) + a.attacker->getEquipStat(EnumStats::attackSpeed)) > (b.attacker->getBaseStat(EnumStats::attackSpeed) + b.attacker->getEquipStat(EnumStats::attackSpeed));
+            return (a.attacker->getBaseStat(StatType::attackSpeed) + a.attacker->getEquipStat(StatType::attackSpeed)) > (b.attacker->getBaseStat(StatType::attackSpeed) + b.attacker->getEquipStat(StatType::attackSpeed));
         });
 
         // All Attacks loop
@@ -182,12 +183,15 @@ void combatCommence(vector<Character>& fighters){
             fighter.resetTurn();
         }
 
-    } // End of Combat loop
+    } // End of Combat loop;
+
+    if(!endGame){
+        rewardSelection(*player);
+    }
 } // End of combatCommence method
 
 
 vector<Action> playerChooseAction(){
-
     int choice;
     vector<Action> actionChoice;
     bool valid = false;
@@ -238,7 +242,6 @@ vector<Action> playerChooseAction(){
 
 
 Character& chooseTarget(vector<Character>& fighters){
-
     string enType;
     int target;
     bool valid = false;
@@ -260,7 +263,7 @@ Character& chooseTarget(vector<Character>& fighters){
                     break;
             }
 
-            cout << i << ".) " << enType << " HP: " << fighters[i].getCurHealth() << "/"  << (fighters[i].getBaseStat(EnumStats::maxHealth) + fighters[i].getEquipStat(EnumStats::maxHealth)) << "\n";
+            cout << i << ".) " << enType << " HP: " << fighters[i].getCurHealth() << "/"  << (fighters[i].getBaseStat(StatType::maxHealth) + fighters[i].getEquipStat(StatType::maxHealth)) << "\n";
         } // End of print loop
 
         cout << "Choose your target: ";
@@ -287,3 +290,102 @@ Character& chooseTarget(vector<Character>& fighters){
 
     return fighters[target];
 } // end of chooseTarget method
+
+
+void rewardSelection(Character& player){
+    Equipment rewardItem = makeRandomEquipment();
+    int equipChoice;
+    bool valid = false;
+    string itemType;
+
+    switch(rewardItem.getType()){
+        case EquipmentType::weapon:
+            itemType = "Weapon";
+            break;
+        case EquipmentType::armor:
+            itemType = "Armor";
+            break;
+        case EquipmentType::helmet:
+            itemType = "Helmet";
+            break;
+    }
+
+    Stats itemStats = rewardItem.getStats();
+    string curStat;
+    string compare;
+
+    // So long as the player's choice is not valid
+    //  They will be prompted to choose a target
+    while(!valid){
+        cout << "Congrats! Looks like they left something behind. Let's compare...\n";
+        std::cout << setw(12) << "New " << itemType << "| Comparison | Current " << itemType << " \n";
+        std::cout << "---------------------------------------------------------------------\n";
+        for (StatType printStat = StatType::maxHealth; printStat != StatType::count; printStat = static_cast<StatType>(static_cast<int>(printStat) +1)){
+            switch (printStat){
+                case StatType::maxHealth:
+                    curStat = "Max HP";
+                    break;
+                case StatType::attackDmg:
+                    curStat = "Damage";
+                    break;
+                case StatType::attackSpeed:
+                    curStat = "Speed";
+                    break;
+                case StatType::defense:
+                    curStat = "Defense";
+                    break;
+                case StatType::critChance:
+                    curStat = "Crit Chance";
+                    break;
+                case StatType::critDmgMod:
+                    curStat = "Crit Dmg Mod";
+                    break;
+            }
+
+            if (itemStats[printStat] > player.getEquipStat(printStat)){
+                compare = ">";
+            }
+            else if (itemStats[printStat] == player.getEquipStat(printStat)){
+                compare = "=";
+            }
+            else{
+                compare = "<";
+            }
+
+
+            cout << curStat << ": " << itemStats[printStat] << " | " << compare << " | " << player.getEquipStat(printStat) << "\n";
+        } // End of print loop
+
+        cout << "\n";
+        cout << "Equip? (will replace current item)";
+        cin >> equipChoice;
+
+        // If: cin fails (non-integer input)
+        //  Then: clear error state and ignore the invalid input
+        if (cin.fail()) {
+            cout << "That's not a choice silly :3 c'mon, try again!\n\n";
+            cin.clear(); // Clears the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignores invalid input in the buffer
+            continue;
+        }
+
+        if (equipChoice == 1 || equipChoice == 0){
+            valid = true;
+        }
+        else {
+            cout << "That's not a choice silly :3 c'mon, try again!\n\n";
+        }
+
+
+        if (equipChoice){
+            for (StatType statSwitch = StatType::maxHealth; statSwitch != StatType::count; statSwitch = static_cast<StatType>(static_cast<int>(statSwitch) +1)){
+                player.setEquipStat(statSwitch, itemStats[statSwitch], rewardItem.getType());
+            }
+
+            cout << "New Item Equipped!\n";
+        }
+        else {
+            cout << "Welp *tosses " << itemType << " aside*\n";
+        }
+    } // End of Valid loop
+} // End of rewardSelection method
