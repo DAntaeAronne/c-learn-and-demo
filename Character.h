@@ -19,7 +19,7 @@ class Character{
         // Modifiers
         void setBaseStat(StatType wantedStat, int val);
         void setEquipStat(StatType wantedStat, int val, EquipmentType item);
-        void setCurHeatlh(int val);
+        void setCurHealth(int val);
         void setDefending(bool val);
 
         // Misc

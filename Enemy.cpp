@@ -9,6 +9,7 @@
 #include "Goblin.h"
 #include "Orc.h"
 #include "RNG.h"
+#include "Equipment.h"
 
 using std::string;
 using std::vector;
@@ -43,6 +44,15 @@ Enemy makeRandomEnemy(){
             createdEnemy = Skeleton();
             break;
     }
+
+    Equipment enemyItem = makeRandomEquipment();
+    Stats itemStats = enemyItem.getStats();
+
+    for (StatType statSwitch = StatType::maxHealth; statSwitch != StatType::count; statSwitch = static_cast<StatType>(static_cast<int>(statSwitch) +1)){
+        createdEnemy.setEquipStat(statSwitch, itemStats[statSwitch], enemyItem.getType());
+    }
+
+    createdEnemy.setCurHealth(createdEnemy.getCurHealth() + createdEnemy.getEquipStat(StatType::maxHealth));
 
     return createdEnemy;
 } // End of makeRandomEnemy method

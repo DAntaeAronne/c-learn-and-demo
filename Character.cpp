@@ -59,9 +59,9 @@ void Character::setEquipStat(StatType wantedStat, int val, EquipmentType item){
 } // End of setEquipStat method
 
 
-void Character::setCurHeatlh(int val){
+void Character::setCurHealth(int val){
     curHealth = val;
-} // End of setCurHeatlh method
+} // End of setCurHealth method
 
 
 void Character::setDefending(bool val){
@@ -90,25 +90,41 @@ void Character::takeDmg(int dmgTaken){
     }
 
     string target;
+    string isAre;
 
     switch(type){
         case CharacterType::goblin:
             target = "Goblin";
+            isAre = "is";
             break;
         case CharacterType::orc:
             target = "Orc";
+            isAre = "is";
             break;
         case CharacterType::skeleton:
             target = "Skeleton";
+            isAre = "is";
             break;
         default:
             target = "You";
+            isAre = "are";
             break;
     }
 
-    setCurHeatlh(curHealth - totalDmgTaken);
+    setCurHealth(curHealth - totalDmgTaken);
 
-    cout <<  target << " took " << totalDmgTaken << " dmg and is now at: " << getCurHealth() << "\n";
+    string endingPhrase;
+
+    if (curHealth <= 0){
+        endingPhrase += "died x_x";
+    }
+    else{
+
+        endingPhrase =  isAre + " now at: " + std::to_string(curHealth);
+    }
+
+
+    cout <<  target << " took " << totalDmgTaken << " dmg and " << endingPhrase << "\n";
 
 
 
@@ -131,8 +147,6 @@ int Character::calcAttackDmg(){
     if (critHit){
         dmgDealt = critDmgDone;
     }
-
-    cout << "Base: " << baseStats.attackDmg << "|||||Equip: " << getEquipStat(StatType::attackDmg) << " CHECK CHECK\n";
 
     return dmgDealt;
 } // End of calcAttackDmg method

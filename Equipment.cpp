@@ -33,9 +33,6 @@ Equipment makeRandomEquipment(){
         randStatType = static_cast<StatType>(randomNumber() % (static_cast<int>(StatType::count) - 1));
         statPoints = randomNumber() % (totalStatsPointsLeft + 1);
         totalStatsPointsLeft -= statPoints;
-
-        std::cout << "!! STATS: " << statPoints << "\n";
-
         itemStats[randStatType] = statPoints;
     } // End of Stat Distribution loop
 

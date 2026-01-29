@@ -24,6 +24,11 @@ using std::setw;
 bool endGame;
 
 void combatCommence(vector<Character>& fighters){
+
+    cout << "WOAH WATCH OUT! (Enemies appears doo doo doo doooooo)\n\n";
+
+    displayEnemies(fighters);
+
     endGame = false;
 
     // Combat loop
@@ -102,7 +107,7 @@ void combatCommence(vector<Character>& fighters){
         } // End of Fighters Choice loop
 
         if(endGame){
-            player->setCurHeatlh(-1);
+            player->setCurHealth(-1);
             break;
         }
 
@@ -122,26 +127,27 @@ void combatCommence(vector<Character>& fighters){
             for(Action& act : attack.actions){
                 dmg = attack.attacker->calcAttackDmg();
 
+                cout << "\n";
                 string atr;
                 switch(attack.attacker->getCharacterType()){
                     case CharacterType::goblin:
-                        atr = "Goblin";
+                        atr = "Goblin is";
                         break;
                     case CharacterType::orc:
-                        atr = "Orc";
+                        atr = "Orc is";
                         break;
                     case CharacterType::skeleton:
-                        atr = "Skeleton";
+                        atr = "Skeleton is";
                         break;
                     default:
-                        atr = "You";
+                        atr = "You are";
                         break;
                 }
-                cout << atr << " is attacking: ";
+                cout << atr << " attacking: ";
 
                 attack.target->takeDmg(dmg);
 
-                cout << "\n\n";
+                cout << "\n";
                 if(atr == "You" && !attack.attacker->isAlive()){
                     break;
                 }
@@ -173,7 +179,7 @@ void combatCommence(vector<Character>& fighters){
             } // End of Removal
 
             if(endGame){
-                player->setCurHeatlh(-1);
+                player->setCurHealth(-1);
                 break;
             }
         } // End of All Attacks loop
@@ -186,9 +192,31 @@ void combatCommence(vector<Character>& fighters){
     } // End of Combat loop;
 
     if(!endGame){
-        rewardSelection(*player);
+        rewardAndHeal(*player);
     }
 } // End of combatCommence method
+
+
+void displayEnemies(vector<Character>& fighters){
+    string enType;
+
+    for (int i = 1; i < fighters.size(); i++){
+
+        switch(fighters[i].getCharacterType()){
+            case CharacterType::goblin:
+                enType = "Goblin";
+                break;
+            case CharacterType::orc:
+                enType = "Orc";
+                break;
+            case CharacterType::skeleton:
+                enType = "Skeleton";
+                break;
+        }
+
+        cout << i << ".) " << enType << " HP: " << fighters[i].getCurHealth() << "/"  << (fighters[i].getBaseStat(StatType::maxHealth) + fighters[i].getEquipStat(StatType::maxHealth)) << "\n";
+    } // End of print loop
+}
 
 
 vector<Action> playerChooseAction(){
@@ -242,29 +270,14 @@ vector<Action> playerChooseAction(){
 
 
 Character& chooseTarget(vector<Character>& fighters){
-    string enType;
     int target;
     bool valid = false;
 
     // So long as the player's choice is not valid
     //  They will be prompted to choose a target
     while(!valid){
-        for (int i = 1; i < fighters.size(); i++){
 
-            switch(fighters[i].getCharacterType()){
-                case CharacterType::goblin:
-                    enType = "Goblin";
-                    break;
-                case CharacterType::orc:
-                    enType = "Orc";
-                    break;
-                case CharacterType::skeleton:
-                    enType = "Skeleton";
-                    break;
-            }
-
-            cout << i << ".) " << enType << " HP: " << fighters[i].getCurHealth() << "/"  << (fighters[i].getBaseStat(StatType::maxHealth) + fighters[i].getEquipStat(StatType::maxHealth)) << "\n";
-        } // End of print loop
+        displayEnemies(fighters);
 
         cout << "Choose your target: ";
         cin >> target;
@@ -292,7 +305,7 @@ Character& chooseTarget(vector<Character>& fighters){
 } // end of chooseTarget method
 
 
-void rewardSelection(Character& player){
+void rewardAndHeal(Character& player){
     Equipment rewardItem = makeRandomEquipment();
     int equipChoice;
     bool valid = false;
@@ -317,6 +330,7 @@ void rewardSelection(Character& player){
     // So long as the player's choice is not valid
     //  They will be prompted to choose a target
     while(!valid){
+
         cout << "Congrats! Looks like they left something behind. Let's compare...\n";
         std::cout << setw(12) << "New " << itemType << "| Comparison | Current " << itemType << " \n";
         std::cout << "---------------------------------------------------------------------\n";
@@ -357,8 +371,10 @@ void rewardSelection(Character& player){
         } // End of print loop
 
         cout << "\n";
-        cout << "Equip? (will replace current item)";
+        cout << "Yes (1) or  No (0)\n";
+        cout << "Equip? (will replace current item): ";
         cin >> equipChoice;
+        cout << "\n";
 
         // If: cin fails (non-integer input)
         //  Then: clear error state and ignore the invalid input
@@ -383,9 +399,26 @@ void rewardSelection(Character& player){
             }
 
             cout << "New Item Equipped!\n";
+
+            player.setCurHealth(player.getCurHealth() + player.getEquipStat(StatType::maxHealth));
         }
         else {
             cout << "Welp *tosses " << itemType << " aside*\n";
         }
     } // End of Valid loop
+
+
+    // Heal
+    int totalMaxHP = player.getBaseStat(StatType::maxHealth) + player.getEquipStat(StatType::maxHealth);
+    int healAmount = static_cast<int>(0.25 * totalMaxHP);
+
+    if((healAmount + player.getCurHealth()) > totalMaxHP){
+        player.setCurHealth(totalMaxHP);
+    }
+    else{
+        player.setCurHealth(player.getCurHealth() + healAmount);
+    }
+
+    cout << "\n*sighhh* A nice refreshing heal after battle\n";
+    cout << "(HP now at: " << player.getCurHealth() << ")\n\n";
 } // End of rewardSelection method
