@@ -15,7 +15,7 @@ using std::vector;
 
 int main(){
 
-    Stats baseStats = {500, 250, 12, 6, 0, 900};
+    Stats baseStats = {500, 20, 12, 6, 0, 900};
     string statsNames[5] = {"maxHealth", "attackDmg", "defense", "critChance", "critDmgMod"};
 
     Character MC(baseStats,  CharacterType::player);

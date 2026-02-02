@@ -7,6 +7,7 @@
 enum struct Action{
     attack,
     defend,
+    lowHealth,
     count,
 };
 

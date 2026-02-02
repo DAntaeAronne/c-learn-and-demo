@@ -16,8 +16,11 @@ class Orc : public Enemy{
     public:
         Orc() : Enemy(orcStats, CharacterType::orc){}
 
-        vector<Action> lowHealthAction();
+        vector<Action> lowHealthAction(Character player, vector<Action> playerAction);
+        void setDefensiveStance(bool val);
 
+    private:
+        bool defensiveStance = false;
 };
 
 #endif

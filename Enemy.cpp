@@ -14,9 +14,73 @@
 using std::string;
 using std::vector;
 
-vector<Action> Enemy::enemyChooseAction(){
+vector<Action> Enemy::enemyChooseAction(Character player, vector<Action> playerAction){
     vector<Action> action;
-    action.push_back(static_cast<Action>(randomNumber() % static_cast<int>(Action::count)));
+    Action chosen;
+    int actionRN;
+
+    int playerDef = 100.00 / (100 + player.getBaseStat(StatType::defense) + player.getEquipStat(StatType::defense));
+    int playerAtkDmg = player.getBaseStat(StatType::attackDmg) + player.getEquipStat(StatType::attackDmg);
+    int enemyAtkDmg = Character::getBaseStat(StatType::attackDmg) + Character::getEquipStat(StatType::attackDmg);
+
+
+    // If the enemy has the damage to potentially kill the player
+    //  Then the enemy is more likely to attack (3/4 chance);
+    if((enemyAtkDmg * playerDef) >= player.getCurHealth()){
+        actionRN = randomNumber() % 4;
+
+        if (actionRN >= 0 && actionRN <= 2){
+            action.push_back(Action::attack);
+        }
+        else{
+            action.push_back(Action::defend);
+        }
+    }
+
+    // If the player is attaking and has the total damage to possibly kill the enemy
+    //  Then the enemy is more likely to defend (2/3 chance);
+    else if ((playerAction[0] == Action::attack) && (playerAtkDmg >= Character::getCurHealth())){
+        actionRN = randomNumber() % 3;
+
+        if (actionRN == 0 || actionRN == 1){
+            action.push_back(Action::defend);
+        }
+        else{
+            action.push_back(Action::attack);
+        }
+    }
+
+    // If the player is defending
+    //  Then always go for an attack
+    else if (playerAction[0] == Action::defend){
+        action.push_back(Action::attack);
+    }
+
+    else{
+        chosen = static_cast<Action>(randomNumber() % static_cast<int>(Action::count));
+
+        while (chosen == Action::lowHealth){
+            chosen = static_cast<Action>(randomNumber() % static_cast<int>(Action::count));
+        }
+        action.push_back(chosen);
+    }
+
+    string enemy;
+    switch(Character::getCharacterType()){
+        case CharacterType::goblin:
+            enemy = "Goblin";
+            break;
+        case CharacterType::orc:
+            enemy = "Orc";
+            break;
+        case CharacterType::skeleton:
+            enemy = "Skeleton";
+            break;
+    }
+
+    if (action[0] == Action::defend){
+        std :: cout << enemy << " is defending!\n";
+    }
 
     return action;
 } // End of chooseAction method

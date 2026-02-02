@@ -8,6 +8,9 @@
 #include "Combat.h"
 #include "Character.h"
 #include "Enemy.h"
+#include "Goblin.h"
+#include "Orc.h"
+#include "Skeleton.h"
 #include "Stats.h"
 #include "Equipment.h"
 
@@ -67,7 +70,9 @@ void combatCommence(vector<Character>& fighters){
 
             // Else: It is an enemy
             else{
-
+                if(attackOrder.empty()){
+                    continue;
+                }
                 // The low health threshold will be 25% of thier max health
                 int fighterMaxHp = fighter.getBaseStat(StatType::maxHealth) + fighter.getEquipStat(StatType::maxHealth);
                 double lowHealthThreshold = 0.25 * fighterMaxHp;
@@ -75,12 +80,23 @@ void combatCommence(vector<Character>& fighters){
                 // If: They are above the low health threshold
                 //  Then: They will choose an action as normal
                 if (fighter.getCurHealth() > lowHealthThreshold){
-                    fighterAction = static_cast<Enemy&>(fighter).enemyChooseAction();
+                    fighterAction = static_cast<Enemy&>(fighter).enemyChooseAction(*player, attackOrder[0].actions);
                 }
 
                 // Else: They will do their own individual low health action unique to their enemy types
                 else{
-                    break;
+                    switch(fighter.getCharacterType()){
+                        case CharacterType::goblin:
+                            fighterAction = static_cast<Goblin&>(fighter).lowHealthAction(fighters, *player, attackOrder[0].actions);
+                            break;
+                        case CharacterType::orc:
+                            fighterAction = static_cast<Orc&>(fighter).lowHealthAction(*player, attackOrder[0].actions);
+                            break;
+                        case CharacterType::skeleton:
+                            fighterAction = static_cast<Skeleton&>(fighter).lowHealthAction();
+                            break;
+                    }
+                    fighterAction.push_back(Action::lowHealth);
                 }
 
                 // If: Attacking
@@ -94,15 +110,11 @@ void combatCommence(vector<Character>& fighters){
 
             AttackOrder tempInfo{&fighter, target, fighterAction};
 
-            switch (fighterAction[0]){
-                case Action::attack:
-                    attackOrder.push_back(tempInfo);
-                    break;
+            if (fighterAction[0] == Action::defend){
+                fighter.setDefending(true);
+            }
 
-                case Action::defend:
-                    fighter.setDefending(true);
-                    break;
-            } // End of fight action resolve
+            attackOrder.push_back(tempInfo);
 
         } // End of Fighters Choice loop
 
@@ -123,35 +135,39 @@ void combatCommence(vector<Character>& fighters){
         // Allowing multiple attacks to go through as well
         for (AttackOrder& attack : attackOrder){
             int dmg;
-            // Damage loop
+            // Action loop
             for(Action& act : attack.actions){
-                dmg = attack.attacker->calcAttackDmg();
 
-                cout << "\n";
-                string atr;
-                switch(attack.attacker->getCharacterType()){
-                    case CharacterType::goblin:
-                        atr = "Goblin is";
-                        break;
-                    case CharacterType::orc:
-                        atr = "Orc is";
-                        break;
-                    case CharacterType::skeleton:
-                        atr = "Skeleton is";
-                        break;
-                    default:
-                        atr = "You are";
-                        break;
-                }
-                cout << atr << " attacking: ";
+                // Attack loop
+                if (act == Action::attack){
+                    dmg = attack.attacker->calcAttackDmg();
 
-                attack.target->takeDmg(dmg);
+                    cout << "\n";
+                    string atr;
+                    switch(attack.attacker->getCharacterType()){
+                        case CharacterType::goblin:
+                            atr = "Goblin is";
+                            break;
+                        case CharacterType::orc:
+                            atr = "Orc is";
+                            break;
+                        case CharacterType::skeleton:
+                            atr = "Skeleton is";
+                            break;
+                        default:
+                            atr = "You are";
+                            break;
+                    }
+                    cout << atr << " attacking: ";
 
-                cout << "\n";
-                if(atr == "You" && !attack.attacker->isAlive()){
-                    break;
-                }
-            } // End of Damage loop
+                    attack.target->takeDmg(dmg);
+
+                    cout << "\n";
+                    if(atr == "You" && !attack.attacker->isAlive()){
+                        break;
+                    }
+                } // End of Attack loop
+            } // End of Action loop
 
             // If: The target is dead then remove
             //  Then: from fighters and the attackOrder, or end the game if it was the player
@@ -245,7 +261,7 @@ vector<Action> playerChooseAction(){
         }
 
         // If choice is one of the actions then end the loop
-        if (((choice >= 1) && (choice < (static_cast<int>(Action::count) + 1))) || choice == 9){
+        if ((choice == 1) || (choice == 2) || choice == 9){
             valid = true;
         }
 

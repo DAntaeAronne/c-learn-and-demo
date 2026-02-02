@@ -16,7 +16,11 @@ class Goblin : public Enemy{
     public:
         Goblin() : Enemy(goblinStats, CharacterType::goblin){}
 
-        vector<Action> lowHealthAction();
+        vector<Action> lowHealthAction(vector<Character>& fighters, Character player, vector<Action> playerAction);
+        void setCallAttempted(bool val);
+
+    private:
+        bool callAttempted = false;
 };
 
 #endif
