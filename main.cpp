@@ -33,7 +33,5 @@ int main(){
         combatCommence(fighters);
     } // End of game
 
-    cout << "\nHOPE YOU HAD FUN!\n";
-
     return 0;
 }

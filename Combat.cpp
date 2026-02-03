@@ -35,8 +35,6 @@ void combatCommence(vector<Character>& fighters){
     else{
         cout << "\nWOAH WATCH OUT! (An enemy appeared)\n\n";
     }
-    displayEnemies(fighters);
-    cout << "\n";
 
     endGame = false;
 
@@ -48,6 +46,12 @@ void combatCommence(vector<Character>& fighters){
 
     // Combat loop
     while (player->isAlive() && (fighters.size() > 1)){
+
+        cout << "----------------------------------------------------------------------\n";
+        cout << "------------------------------Turn Start------------------------------\n";
+        cout << "----------------------------------------------------------------------\n";
+        displayEnemies(fighters);
+        cout << "\n";
 
         bool playerTurn = true;
         vector<AttackOrder> attackOrder;
@@ -69,6 +73,9 @@ void combatCommence(vector<Character>& fighters){
                 if (fighterAction[0] == Action::attack){
                     target = &chooseTarget(fighters);
                 }
+
+                cout << "----------------------------------------------------------------------\n";
+                cout << "Action... START!!\n";
 
                 playerTurn = false;
             } // End of Player Choice
@@ -125,7 +132,7 @@ void combatCommence(vector<Character>& fighters){
         } // End of Fighters Choice loop
 
         if(endGame){
-            exit(0);
+            gameOver();
         }
 
 
@@ -134,6 +141,7 @@ void combatCommence(vector<Character>& fighters){
             // 'a' comes before 'b' if 'a' is faster
             return (a.attacker->getBaseStat(StatType::attackSpeed) + a.attacker->getEquipStat(StatType::attackSpeed)) > (b.attacker->getBaseStat(StatType::attackSpeed) + b.attacker->getEquipStat(StatType::attackSpeed));
         });
+
 
         // All Attacks loop
         // Attack in order from fastest to slowest
@@ -182,7 +190,7 @@ void combatCommence(vector<Character>& fighters){
 
                 if (!player->isAlive()){
                     cout << "You died taking " << dmg << " dmg\n\n";
-                    exit(0);
+                    gameOver();
                 }
 
                 attackOrder.erase(remove_if(attackOrder.begin(), attackOrder.end(),
@@ -204,7 +212,7 @@ void combatCommence(vector<Character>& fighters){
             } // End of Removal
 
             if(endGame){
-                exit(0);
+                gameOver();
             }
 
             attackOrderIndex++;
@@ -290,9 +298,7 @@ vector<Action> playerChooseAction(Character& player){
     // If: The player chooses to end the game
     //  Then: Set endGame to true
     if (choice == 9){
-        cout << "GAME OVER\n\n";
-        endGame = true;
-        exit(0);
+        gameOver();
     }
 
     return actionChoice;
@@ -358,13 +364,15 @@ void rewardAndHeal(Character& player){
     string curStat;
     string compare;
 
+    cout << "----------------------------------------------------------------------\n";
+
     // So long as the player's choice is not valid
     //  They will be prompted to choose a target
     while(!valid){
 
         cout << "Congrats! Looks like they left something behind. Let's compare...\n";
         std::cout << setw(12) << "New " << itemTypeString << "| Comparison | Current " << itemTypeString << " \n";
-        std::cout << "---------------------------------------------------------------------\n";
+        std::cout << "----------------------------------------------------------------------\n";
         for (StatType printStat = StatType::maxHealth; printStat != StatType::count; printStat = static_cast<StatType>(static_cast<int>(printStat) +1)){
             switch (printStat){
                 case StatType::maxHealth:
@@ -452,4 +460,14 @@ void rewardAndHeal(Character& player){
 
     cout << "\n*sighhh* A nice refreshing heal after battle\n";
     cout << "(HP now at: " << player.getCurHealth() << ")\n\n";
+
+
+    std::cout << "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n";
 } // End of rewardSelection method
+
+
+void gameOver(){
+    cout << "GAME OVER\n";
+    cout << "\nHOPE YOU HAD FUN!\n";
+    exit(0);
+}

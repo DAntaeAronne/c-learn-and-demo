@@ -24,4 +24,6 @@ Character& chooseTarget(vector<Character>& fighters);
 
 void rewardAndHeal(Character& player);
 
+void gameOver();
+
 #endif
