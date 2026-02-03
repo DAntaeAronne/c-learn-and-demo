@@ -28,8 +28,13 @@ bool endGame;
 
 void combatCommence(vector<Character>& fighters){
 
-    cout << "\nWOAH WATCH OUT! (Enemies appears)\n\n";
-
+    // More than 1 enemy
+    if (fighters.size() > 2){
+        cout << "\nWOAH WATCH OUT! (Enemies appears)\n\n";
+    }
+    else{
+        cout << "\nWOAH WATCH OUT! (An enemy appeared)\n\n";
+    }
     displayEnemies(fighters);
     cout << "\n";
 
@@ -44,7 +49,7 @@ void combatCommence(vector<Character>& fighters){
     // Combat loop
     while (player->isAlive() && (fighters.size() > 1)){
 
-        int i = 0;
+        bool playerTurn = true;
         vector<AttackOrder> attackOrder;
 
         // Fighter Choice loop
@@ -56,8 +61,8 @@ void combatCommence(vector<Character>& fighters){
             // If: Fighter is the player
             //  Then: Prompt the player to choose an action
             //       and follow through accordingly
-            if (i == 0){
-                fighterAction = playerChooseAction();
+            if (playerTurn){
+                fighterAction = playerChooseAction(*player);
 
                 // If: Attacking
                 //  Then: Choose your target
@@ -65,7 +70,7 @@ void combatCommence(vector<Character>& fighters){
                     target = &chooseTarget(fighters);
                 }
 
-                i++;
+                playerTurn = false;
             } // End of Player Choice
 
 
@@ -120,8 +125,7 @@ void combatCommence(vector<Character>& fighters){
         } // End of Fighters Choice loop
 
         if(endGame){
-            player->setCurHealth(-1);
-            break;
+            exit(0);
         }
 
 
@@ -134,7 +138,9 @@ void combatCommence(vector<Character>& fighters){
         // All Attacks loop
         // Attack in order from fastest to slowest
         // Allowing multiple attacks to go through as well
-        for (AttackOrder& attack : attackOrder){
+        int attackOrderIndex = 0;
+        while (attackOrder.size() > 1 && attackOrderIndex < attackOrder.size()){
+            AttackOrder& attack = attackOrder[attackOrderIndex];
             int dmg;
             // Action loop
             for(Action& act : attack.actions){
@@ -176,8 +182,7 @@ void combatCommence(vector<Character>& fighters){
 
                 if (!player->isAlive()){
                     cout << "You died taking " << dmg << " dmg\n\n";
-                    endGame = true;
-                    break;
+                    exit(0);
                 }
 
                 attackOrder.erase(remove_if(attackOrder.begin(), attackOrder.end(),
@@ -193,12 +198,16 @@ void combatCommence(vector<Character>& fighters){
                     }),
                     fighters.end()
                 ); // end of Erase for fighters
+
+                 attackOrderIndex--;
+
             } // End of Removal
 
             if(endGame){
-                player->setCurHealth(-1);
-                break;
+                exit(0);
             }
+
+            attackOrderIndex++;
         } // End of All Attacks loop
 
         // Resetting fighter states at the end of the turn
@@ -236,14 +245,17 @@ void displayEnemies(vector<Character>& fighters){
 }
 
 
-vector<Action> playerChooseAction(){
+vector<Action> playerChooseAction(Character& player){
     int choice;
     vector<Action> actionChoice;
     bool valid = false;
 
+    cout << "=========================================================\n\n";
+
     // So long as the player's choice is not valid
     //  They will be prompted to choose an action
     while(!valid){
+        cout << "Current HP: " << player.getCurHealth() << "/" << (player.getBaseStat(StatType::maxHealth) + player.getEquipStat(StatType::maxHealth)) << "\n";
         cout << "What will you do?\n";
         cout << "1.) Attack\n";
         cout << "2.) Defend\n";
@@ -280,6 +292,7 @@ vector<Action> playerChooseAction(){
     if (choice == 9){
         cout << "GAME OVER\n\n";
         endGame = true;
+        exit(0);
     }
 
     return actionChoice;
@@ -326,17 +339,18 @@ void rewardAndHeal(Character& player){
     Equipment rewardItem = makeRandomEquipment();
     int equipChoice;
     bool valid = false;
-    string itemType;
+    string itemTypeString;
+    EquipmentType rewardItemType = rewardItem.getType();
 
-    switch(rewardItem.getType()){
+    switch(rewardItemType){
         case EquipmentType::weapon:
-            itemType = "Weapon";
+            itemTypeString = "Weapon";
             break;
         case EquipmentType::armor:
-            itemType = "Armor";
+            itemTypeString = "Armor";
             break;
         case EquipmentType::helmet:
-            itemType = "Helmet";
+            itemTypeString = "Helmet";
             break;
     }
 
@@ -349,7 +363,7 @@ void rewardAndHeal(Character& player){
     while(!valid){
 
         cout << "Congrats! Looks like they left something behind. Let's compare...\n";
-        std::cout << setw(12) << "New " << itemType << "| Comparison | Current " << itemType << " \n";
+        std::cout << setw(12) << "New " << itemTypeString << "| Comparison | Current " << itemTypeString << " \n";
         std::cout << "---------------------------------------------------------------------\n";
         for (StatType printStat = StatType::maxHealth; printStat != StatType::count; printStat = static_cast<StatType>(static_cast<int>(printStat) +1)){
             switch (printStat){
@@ -373,10 +387,10 @@ void rewardAndHeal(Character& player){
                     break;
             }
 
-            if (itemStats[printStat] > player.getEquipStat(printStat)){
+            if (itemStats[printStat] > player.getEquipStat(rewardItemType, printStat)){
                 compare = ">";
             }
-            else if (itemStats[printStat] == player.getEquipStat(printStat)){
+            else if (itemStats[printStat] == player.getEquipStat(rewardItemType, printStat)){
                 compare = "=";
             }
             else{
@@ -384,7 +398,7 @@ void rewardAndHeal(Character& player){
             }
 
 
-            cout << curStat << ": " << itemStats[printStat] << " | " << compare << " | " << player.getEquipStat(printStat) << "\n";
+            cout << curStat << ": " << itemStats[printStat] << " | " << compare << " | " << player.getEquipStat(rewardItemType, printStat) << "\n";
         } // End of print loop
 
         cout << "\n";
@@ -420,7 +434,7 @@ void rewardAndHeal(Character& player){
             player.setCurHealth(player.getCurHealth() + player.getEquipStat(StatType::maxHealth));
         }
         else {
-            cout << "Welp *tosses " << itemType << " aside*\n";
+            cout << "Welp *tosses " << itemTypeString << " aside*\n";
         }
     } // End of Valid loop
 

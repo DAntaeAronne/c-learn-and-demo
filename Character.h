@@ -4,6 +4,7 @@
 
 #include <string>
 #include <stdexcept>
+#include "Equipment.h"
 #include "Stats.h"
 
 class Character{
@@ -13,6 +14,7 @@ class Character{
         // Accessors
         int getBaseStat(StatType wantedStat) const;
         int getEquipStat(StatType wantedStat) const;
+        int getEquipStat(EquipmentType item, StatType wantedStat) const;
         int getCurHealth() const;
         CharacterType getCharacterType() const;
 

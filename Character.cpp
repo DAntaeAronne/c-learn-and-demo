@@ -39,6 +39,11 @@ int Character::getEquipStat(StatType wantedStat) const{
 } // End of getEquipStat method
 
 
+int Character::getEquipStat(EquipmentType item, StatType wantedStat) const{
+    return equipmentBonus[static_cast<int>(item)][wantedStat];
+} // End of getEquipStat method
+
+
 int Character::getCurHealth() const{
     return curHealth;
 } // End of getCurHealth method
@@ -141,7 +146,7 @@ int Character::calcAttackDmg(){
 
     if (((randomNumber() % 100) < totalCritChance) && (totalCritChance > 0)){
         critHit = true;
-        cout << "- WOAH!!! NICE CRIT!!! - ";
+        cout << "- !CRIT! - ";
     }
 
     if (critHit){

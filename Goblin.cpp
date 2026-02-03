@@ -45,8 +45,6 @@ vector<Action> Goblin::lowHealthAction(vector<Character>& fighters, Character pl
         }
 
         setCallAttempted(true);
-
-        cout << "!!!!! CALL SET";
     } // End of Call Attempt
 
     // Choose action as normal

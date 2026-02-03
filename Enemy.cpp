@@ -79,7 +79,7 @@ vector<Action> Enemy::enemyChooseAction(Character player, vector<Action> playerA
     }
 
     if (action[0] == Action::defend){
-        std :: cout << enemy << " is defending!\n";
+        std :: cout << "\n" << enemy << " is defending!\n";
     }
 
     return action;

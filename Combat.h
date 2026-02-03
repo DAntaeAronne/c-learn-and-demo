@@ -18,7 +18,7 @@ void combatCommence(vector<Character>& fighters);
 
 void displayEnemies(vector<Character>& fighters);
 
-vector<Action> playerChooseAction();
+vector<Action> playerChooseAction(Character& player);
 
 Character& chooseTarget(vector<Character>& fighters);
 
