@@ -28,9 +28,10 @@ bool endGame;
 
 void combatCommence(vector<Character>& fighters){
 
-    cout << "WOAH WATCH OUT! (Enemies appears doo doo doo doooooo)\n\n";
+    cout << "\nWOAH WATCH OUT! (Enemies appears)\n\n";
 
     displayEnemies(fighters);
+    cout << "\n";
 
     endGame = false;
 
