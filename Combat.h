@@ -14,16 +14,16 @@ struct AttackOrder {
     vector<Action> actions;
 };
 
-void combatCommence(vector<Character>& fighters);
+void combatCommence(vector<Character>& fighters, int& enemiesSlain);
 
 void displayEnemies(vector<Character>& fighters);
 
-vector<Action> playerChooseAction(Character& player);
+vector<Action> playerChooseAction(Character& player, int& enemiesSlain);
 
 Character& chooseTarget(vector<Character>& fighters);
 
 void rewardAndHeal(Character& player);
 
-void gameOver();
+void gameOver(int& enemiesSlain);
 
 #endif

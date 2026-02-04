@@ -5,6 +5,8 @@
 #include "Stats.h"
 #include "RNG.h"
 
+using std::string;
+
 
 Equipment::Equipment(Stats itemStats, EquipmentType itemType):
     stats(itemStats), type(itemType){
@@ -30,10 +32,15 @@ Equipment makeRandomEquipment(){
 
     // Stat Distribution loop
     while(totalStatsPointsLeft != 0){
-        randStatType = static_cast<StatType>(randomNumber() % (static_cast<int>(StatType::count) - 1));
+
+        randStatType = static_cast<StatType>(randomNumber() % (static_cast<int>(StatType::count)));
         statPoints = randomNumber() % (totalStatsPointsLeft + 1);
+        if (statPoints > 50){
+            statPoints -= 50;
+        }
         totalStatsPointsLeft -= statPoints;
-        itemStats[randStatType] = statPoints;
+        itemStats[randStatType] += statPoints;
+
     } // End of Stat Distribution loop
 
     Equipment itemMade(itemStats, randItemType);

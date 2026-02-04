@@ -18,6 +18,7 @@ vector<Action> Enemy::enemyChooseAction(Character player, vector<Action> playerA
     vector<Action> action;
     Action chosen;
     int actionRN;
+    bool valid = false;
 
     int playerDef = 100.00 / (100 + player.getBaseStat(StatType::defense) + player.getEquipStat(StatType::defense));
     int playerAtkDmg = player.getBaseStat(StatType::attackDmg) + player.getEquipStat(StatType::attackDmg);

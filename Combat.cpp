@@ -26,7 +26,7 @@ using std::setw;
 
 bool endGame;
 
-void combatCommence(vector<Character>& fighters){
+void combatCommence(vector<Character>& fighters, int& enemiesSlain){
 
     // More than 1 enemy
     if (fighters.size() > 2){
@@ -66,7 +66,7 @@ void combatCommence(vector<Character>& fighters){
             //  Then: Prompt the player to choose an action
             //       and follow through accordingly
             if (playerTurn){
-                fighterAction = playerChooseAction(*player);
+                fighterAction = playerChooseAction(*player, enemiesSlain);
 
                 // If: Attacking
                 //  Then: Choose your target
@@ -123,8 +123,18 @@ void combatCommence(vector<Character>& fighters){
 
             AttackOrder tempInfo{&fighter, target, fighterAction};
 
-            if (fighterAction[0] == Action::defend){
-                fighter.setDefending(true);
+            switch (fighterAction[0]){
+                case Action::defend:
+                    fighter.setDefending(true);
+                    break;
+                case Action::counter:
+                    fighter.setIsCountering(true);
+                    cout << "Preparing counter...\n\n";
+                    break;
+                case Action::charge:
+                    fighter.setIsCharging(true);
+                    cout << "CHARGING UP!\n\n";
+                    break;
             }
 
             attackOrder.push_back(tempInfo);
@@ -132,7 +142,7 @@ void combatCommence(vector<Character>& fighters){
         } // End of Fighters Choice loop
 
         if(endGame){
-            gameOver();
+            gameOver(enemiesSlain);
         }
 
 
@@ -175,22 +185,38 @@ void combatCommence(vector<Character>& fighters){
                     }
                     cout << atr << " attacking: ";
 
+                    // If the target is countering
+                    //  Then take half of the damgage and return the other half to the attacker
+                    if (attack.target->getIsCountering()){
+                        dmg = dmg / 2;
+                        cout << "Countered!\n";
+                    }
+
                     attack.target->takeDmg(dmg);
+
+                    if (attack.target->getIsCountering()){
+                        attack.attacker->takeDmg(dmg);
+                        attack.target->setIsCountering(false);
+                    }
 
                     cout << "\n";
                     if(atr == "You" && !attack.attacker->isAlive()){
                         break;
                     }
                 } // End of Attack loop
+
+                if (!attack.attacker->isAlive()){
+                    break;
+                }
             } // End of Action loop
 
             // If: The target is dead then remove
             //  Then: from fighters and the attackOrder, or end the game if it was the player
-            if (!attack.target->isAlive()){
+            if (!attack.target->isAlive() || !attack.attacker->isAlive()){
 
                 if (!player->isAlive()){
                     cout << "You died taking " << dmg << " dmg\n\n";
-                    gameOver();
+                    gameOver(enemiesSlain);
                 }
 
                 attackOrder.erase(remove_if(attackOrder.begin(), attackOrder.end(),
@@ -209,10 +235,12 @@ void combatCommence(vector<Character>& fighters){
 
                  attackOrderIndex--;
 
+                 enemiesSlain++;
+
             } // End of Removal
 
             if(endGame){
-                gameOver();
+                gameOver(enemiesSlain);
             }
 
             attackOrderIndex++;
@@ -221,6 +249,18 @@ void combatCommence(vector<Character>& fighters){
         // Resetting fighter states at the end of the turn
         for (Character& fighter : fighters){
             fighter.resetTurn();
+        }
+
+        // Increase the cooldowns
+        fighters[0].setCounterCooldown(fighters[0].getCounterCooldown() + 1);
+        fighters[0].setChargeCooldown(fighters[0].getChargeCooldown() + 1);
+
+        if(fighters[0].getCounterCooldown() > 1){
+            fighters[0].setCounterAvailable(true);
+        }
+
+        if(fighters[0].getChargeCooldown() > 2){
+            fighters[0].setChargeAvailable(true);
         }
 
     } // End of Combat loop;
@@ -253,12 +293,31 @@ void displayEnemies(vector<Character>& fighters){
 }
 
 
-vector<Action> playerChooseAction(Character& player){
+vector<Action> playerChooseAction(Character& player, int& enemiesSlain){
     int choice;
     vector<Action> actionChoice;
     bool valid = false;
 
     cout << "=========================================================\n\n";
+
+    string counterAvailable;
+    string chargeAvailable;
+
+
+    if(!player.getCounterAvailable()){
+        counterAvailable = "Counter on Cooldown\n";
+    }
+    else{
+        counterAvailable = "2.) Counter\n";
+    }
+
+
+    if(!player.getChargeAvailable()){
+        chargeAvailable = "Charge on Cooldown\n";
+    }
+    else{
+        chargeAvailable = "3.) Charge\n";
+    }
 
     // So long as the player's choice is not valid
     //  They will be prompted to choose an action
@@ -266,7 +325,8 @@ vector<Action> playerChooseAction(Character& player){
         cout << "Current HP: " << player.getCurHealth() << "/" << (player.getBaseStat(StatType::maxHealth) + player.getEquipStat(StatType::maxHealth)) << "\n";
         cout << "What will you do?\n";
         cout << "1.) Attack\n";
-        cout << "2.) Defend\n";
+        cout << counterAvailable;
+        cout << chargeAvailable;
         cout << "9.) Leave (End Game)\n";
         cout << "Choice: ";
         cin >> choice;
@@ -282,8 +342,23 @@ vector<Action> playerChooseAction(Character& player){
         }
 
         // If choice is one of the actions then end the loop
-        if ((choice == 1) || (choice == 2) || choice == 9){
-            valid = true;
+        if (((choice >= 1) && (choice <= 3)) || choice == 9){
+            // If the choice is an action that is on cooldown
+            //  Then let the player know and have them choose again
+            if ((choice == 2 && !player.getCounterAvailable()) || (choice == 3 && !player.getChargeAvailable())){
+                cout << "That is on cool down silly :3, choose something else!\n\n";
+            }
+            else if (choice == 2 && player.getCounterAvailable()){
+                choice = static_cast<int>(Action::counter) + 1;
+                valid = true;
+            }
+            else if (choice == 3 && player.getChargeAvailable()){
+                choice = static_cast<int>(Action::charge) + 1;
+                valid = true;
+            }
+            else{
+                valid = true;
+            }
         }
 
         else{
@@ -298,7 +373,7 @@ vector<Action> playerChooseAction(Character& player){
     // If: The player chooses to end the game
     //  Then: Set endGame to true
     if (choice == 9){
-        gameOver();
+        gameOver(enemiesSlain);
     }
 
     return actionChoice;
@@ -466,8 +541,9 @@ void rewardAndHeal(Character& player){
 } // End of rewardSelection method
 
 
-void gameOver(){
+void gameOver(int& enemiesSlain){
     cout << "GAME OVER\n";
-    cout << "\nHOPE YOU HAD FUN!\n";
+    cout << "Enemies Slain: " << enemiesSlain << "\n";
+    cout << "\nHOPE YOU HAD FUN!\n\n";
     exit(0);
 }

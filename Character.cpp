@@ -54,6 +54,36 @@ CharacterType Character::getCharacterType() const{
 } // End of getCharacterType method
 
 
+bool Character::getCounterAvailable() const{
+    return counterAvailable;
+} // End of getIsCountering
+
+
+int Character::getCounterCooldown() const{
+    return counterCooldown;
+} // End of getCounterCooldown
+
+
+bool Character::getIsCountering() const{
+    return isCountering;
+} // End of getIsCountering
+
+
+bool Character::getChargeAvailable() const{
+    return chargeAvailable;
+} // End of getIsCountering
+
+
+int Character::getChargeCooldown() const{
+    return chargeCooldown;
+} // End of getChargeCooldown
+
+
+bool Character::getIsCharging() const{
+    return isCharging;
+} // End of getIsCountering
+
+
 void Character::setBaseStat(StatType wantedStat, int val){
     baseStats[wantedStat] = val;
 } // End of setBaseStat method
@@ -74,20 +104,57 @@ void Character::setDefending(bool val){
 } // End of setDefending method
 
 
+void Character::setCounterCooldown (int val){
+    counterCooldown = val;
+} // End of setCounterCooldown
+
+
+void Character::setCounterAvailable (bool val){
+    counterAvailable = val;
+} // End of setCounterCooldown
+
+
+void Character::setIsCountering(bool val){
+    isCountering = val;
+    counterCooldown = 0;
+    counterAvailable = false;
+} // End of setIsCountering
+
+
+void Character::setChargeCooldown (int val){
+    chargeCooldown = val;
+} // End of setCounterCooldown
+
+
+void Character::setChargeAvailable (bool val){
+    chargeAvailable = val;
+} // End of setCounterCooldown
+
+
+void Character::setIsCharging(bool val){
+    isCharging = val;
+    chargeCooldown = 0;
+    chargeAvailable = false;
+} // End of setIsCharging
+
+
+
+
+
 bool Character::isAlive(){
     return (curHealth > 0 ? true : false);
 } // End of setEquipStat method
 
 
 void Character::takeDmg(int dmgTaken){
+
     int totalDmgTaken;
 
-    // If not defending
+    // If not defending or countering
     //   Then take damage with only passive defense in mind
     if (!defending){
         totalDmgTaken = static_cast<int>(dmgTaken) * (100.00 / (100 + baseStats.defense + getEquipStat(StatType::defense)));
     }
-
     // Else
     //   Mulltipy total defense stat by 3
     else{
@@ -130,9 +197,6 @@ void Character::takeDmg(int dmgTaken){
 
 
     cout <<  target << " took " << totalDmgTaken << " dmg and " << endingPhrase << "\n";
-
-
-
 } // End of takeDmg method
 
 
@@ -140,7 +204,8 @@ int Character::calcAttackDmg(){
     // Regardless of the number generated,
     //  the character needs to have a critChance above 0 for crits to be available
 
-    int dmgDealt = randomNumber() % (baseStats.attackDmg + getEquipStat(StatType::attackDmg));
+    int dmgDealt = baseStats.attackDmg +  (randomNumber() % (baseStats.attackDmg +getEquipStat(StatType::attackDmg)));
+
     int totalCritChance = baseStats.critChance + getEquipStat(StatType::critChance);
     int critDmgDone = static_cast<int>(static_cast<double>(dmgDealt) * (1.0 + static_cast<double>(baseStats.critDmgMod + getEquipStat(StatType::critDmgMod)) / 100));
 
@@ -151,6 +216,12 @@ int Character::calcAttackDmg(){
 
     if (critHit){
         dmgDealt = critDmgDone;
+    }
+
+    if(isCharging){
+        cout << "\nCHARGED ATTACK: RELEASED!";
+        dmgDealt = dmgDealt * 2;
+        isCharging = false;
     }
 
     return dmgDealt;

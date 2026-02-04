@@ -9,6 +9,8 @@ enum struct Action{
     defend,
     lowHealth,
     count,
+    counter,
+    charge,
 };
 
 enum struct CharacterType {
