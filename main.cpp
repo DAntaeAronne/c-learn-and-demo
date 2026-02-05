@@ -101,11 +101,11 @@ void printTutorial(){
     cout << "             This can still crit but does not have a stacking effect\n";
     cout << "             (Careful, this has a 2 turn cooldown)\n";
     cout << "\n";
-    cout << "You will also face 3 types of enmemies that have different actions when reaching low health:\n";
+    cout << "You will also face 3 types of enemies that have different actions when reaching low health:\n";
     cout << "1.) Goblins - These creeps have the most average stats amongst the enemies\n";
     cout << "              When reaching low health, they will try to call for reinforcements from their goblin tribe\n";
-    cout << "2.) Skeletons - These boneheads have the lowest health but can output a shocking amount of damage with increase crit chances\n";
-    cout << "              When reaching low health, they will release 2 attacks instead of once as final booms for the glass canon they are\n";
+    cout << "2.) Skeletons - These boneheads have the lowest health but can output a shocking amount of damage with increased crit chances\n";
+    cout << "              When reaching low health, they will release 2 attacks instead of once as final booms for the glass cannon they are\n";
     cout << "3.) Orcs - These fellas are the tankiest and hardest hitting for base damage\n";
     cout << "              When reaching low health, they will switch to a defensive stance, trying to by time for the other allies to take you down\n";
     cout << "\n";
