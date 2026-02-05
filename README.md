@@ -16,4 +16,8 @@ While the design could expand further, my focus was to create a functional and e
 
           
 I appreciate the time and consideration you have taken to review my project. If you'd like to see prior projects, please visit my portfolio:   
+<<<<<<< HEAD
 	[Portfolio](https://github.com/DAntaeAronne/Portfolio)
+=======
+	[Portfolio](https://github.com/DAntaeAronne/Portfolio)         
+>>>>>>> 994f014613e1a4e08ba6487e94d53727f9ba3426
